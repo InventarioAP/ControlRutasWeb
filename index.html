@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Rutas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Control de Rutas</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showView('ingresoDatos')">Ingreso Datos</button>
+            <button class="tab-button" onclick="showView('verDatos')">Ver Datos</button>
+        </div>
+
+        <div id="ingresoDatos" class="view active">
+            <h2>Ingreso de Datos</h2>
+            <p>Por favor, complete el formulario a continuación para registrar los datos de la ruta recorrida.</p>
+
+            <form id="ingresoForm">
+
+                <div class="form-group">
+                    <label for="anio">Año:</label>
+                    <input type="text" id="anio" readonly required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mes">Mes:</label>
+                    <select id="mes" required>
+                        <option value="">SELECCIONE UN MES</option>
+                        <option value="ENERO">ENERO</option>
+                        <option value="FEBRERO">FEBRERO</option>
+                        <option value="MARZO">MARZO</option>
+                        <option value="ABRIL">ABRIL</option>
+                        <option value="MAYO">MAYO</option>
+                        <option value="JUNIO">JUNIO</option>
+                        <option value="JULIO">JULIO</option>
+                        <option value="AGOSTO">AGOSTO</option>
+                        <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                        <option value="OCTUBRE">OCTUBRE</option>
+                        <option value="NOVIEMBRE">NOVIEMBRE</option>
+                        <option value="DICIEMBRE">DICIEMBRE</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroUnidad">Número de Unidad:</label>
+                    <select id="numeroUnidad" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="piloto">Piloto:</label>
+                    <select id="piloto" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroDia">Número de Día:</label>
+                    <select id="numeroDia" required>
+                        <option value="">Seleccione un día</option>
+                        </select>
+                </div>
+                <div class="form-group">
+                    <label for="rutaRecorrida">Ruta Recorrida:</label>
+                    <input type="text" id="rutaRecorrida" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kmInicial">Km Inicial:</label>
+                    <input type="number" id="kmInicial" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kmFinal">Km Final:</label>
+                    <input type="number" id="kmFinal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kmDia">Km del Día:</label>
+                    <input type="text" id="kmDia" readonly required>
+                </div>
+
+                <div class="form-group">
+                    <label for="observaciones">Observaciones:</label>
+                    <textarea id="observaciones"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="noValeCombustible">No. Vale Combustible:</label>
+                    <input type="text" id="noValeCombustible">
+                </div>
+
+                <div class="form-group">
+                    <label for="galones">Galones:</label>
+                    <input type="number" id="galones" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="valorQuetzal">Valor (Q):</label>
+                    <input type="number" id="valorQuetzal" step="0.01">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit">Enviar Datos</button>
+                    <button type="button" onclick="clearForm()">Limpiar</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="verDatos" class="view">
+            <h2>Ver Datos Ingresados</h2>
+            <div class="filters">
+                
+                <div class="form-group">
+                    <label for="filterAnio">Año:</label>
+                    <select id="filterAnio" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="filterMes">Mes:</label>
+                    <select id="filterMes" required>
+                        <option value="">SELECCIONE UN MES</option>
+                        <option value="ENERO">ENERO</option>
+                        <option value="FEBRERO">FEBRERO</option>
+                        <option value="MARZO">MARZO</option>
+                        <option value="ABRIL">ABRIL</option>
+                        <option value="MAYO">MAYO</option>
+                        <option value="JUNIO">JUNIO</option>
+                        <option value="JULIO">JULIO</option>
+                        <option value="AGOSTO">AGOSTO</option>
+                        <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                        <option value="OCTUBRE">OCTUBRE</option>
+                        <option value="NOVIEMBRE">NOVIEMBRE</option>
+                        <option value="DICIEMBRE">DICIEMBRE</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="filterNumeroUnidad">Número de Unidad:</label>
+                    <select id="filterNumeroUnidad" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="placaUnidad">Placa Unidad:</label>
+                    <input type="text" id="placaUnidad" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="pilotoResponsable">Piloto Responsable:</label>
+                    <input type="text" id="pilotoResponsable" readonly>
+                </div>
+
+                <button onclick="buscarDatos()">Buscar Datos</button>
+            </div>
+
+            <div class="resumen-mensual" style="display: flex; gap: 1em; margin: 1em 0;">
+                <div class="form-group">
+                    <label for="kmMensual">Km Mensual:</label>
+                    <input type="text" id="kmMensual" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="galonesMensual">Galones Mensual:</label>
+                    <input type="text" id="galonesMensual" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="valorQtzMensual">ValorQTZ Mensual:</label>
+                    <input type="text" id="valorQtzMensual" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="mediaKmGalon">MEDIA KM/GALON:</label>
+                    <input type="text" id="mediaKmGalon" readonly>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="tablaRutas">
+                    <thead>
+                        <tr>
+                            <th>DÍA</th>
+                            <th>RUTA RECORRIDA</th>
+                            <th>KM INICIAL</th>
+                            <th>KM FINAL</th>
+                            <th>KM DÍA</th>
+                            <th>OBSERVACIONES</th>
+                            <th>NO. VALE</th>
+                            <th>GALONES</th>
+                            <th>VALOR (Q)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se llenarán las filas por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
