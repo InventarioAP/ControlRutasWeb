@@ -14,16 +14,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         numeroDiaSelect.appendChild(option);
     }
 
-    // Event listeners for KmInicial and KmFinal to calculate KmDia
+    // Referencias a los campos y botón de envío
     const kmInicialInput = document.getElementById('kmInicial');
     const kmFinalInput = document.getElementById('kmFinal');
     const kmDiaInput = document.getElementById('kmDia');
+    const enviarBtn = document.querySelector('button[type="submit"]');
 
+    // Función para calcular y validar KmDia
     const calculateKmDia = () => {
         const kmInicial = parseFloat(kmInicialInput.value) || 0;
         const kmFinal = parseFloat(kmFinalInput.value) || 0;
         const kmDia = kmFinal - kmInicial;
-        kmDiaInput.value = kmDia >= 0 ? kmDia.toFixed(2) : 'Error'; // Ensure non-negative and format
+        if (kmDia >= 0) {
+            kmDiaInput.value = kmDia.toFixed(2);
+            kmDiaInput.style.backgroundColor = '';
+            kmDiaInput.style.color = '';
+            enviarBtn.disabled = false;
+        } else {
+            kmDiaInput.value = 'Error';
+            kmDiaInput.style.backgroundColor = '#ffcccc';
+            kmDiaInput.style.color = '#b30000';
+            enviarBtn.disabled = true;
+        }
     };
     
     kmInicialInput.addEventListener('input', calculateKmDia);
@@ -41,6 +53,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener para form submit
     document.getElementById('ingresoForm').addEventListener('submit', async function(event) {
         event.preventDefault();
+
+        // Validar que kmDia no sea "Error"
+        if (kmDiaInput.value === 'Error') {
+            alert('La diferencia entre Km Final y Km Inicial no puede ser negativa.');
+            return;
+        }
+
+        enviarBtn.disabled = true; // Deshabilitar botón mientras se envía
 
         // Recoger los datos del formulario en el orden solicitado
         const ANIO = document.getElementById('anio').value;
@@ -108,13 +128,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             alert('Error de conexión al enviar los datos');
+        } finally {
+            enviarBtn.disabled = false; // Habilitar botón después del envío
         }
     });
 
     // Convertir automáticamente a mayúsculas el campo rutaRecorrida
     const rutaRecorridaInput = document.getElementById('rutaRecorrida');
+    const observacionesInput = document.getElementById('observaciones');
     if (rutaRecorridaInput) {
         rutaRecorridaInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+    }
+    if (observacionesInput) {
+        observacionesInput.addEventListener('input', function () {
             this.value = this.value.toUpperCase();
         });
     }
