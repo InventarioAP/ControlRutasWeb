@@ -267,6 +267,7 @@ async function buscarDatos() {
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
         `;
         tbody.appendChild(tr);
     }
@@ -292,10 +293,12 @@ async function buscarDatos() {
                 fila.children[2].textContent = dato.kmInicial || '';
                 fila.children[3].textContent = dato.kmFinal || '';
                 fila.children[4].textContent = dato.kmDia || '';
-                fila.children[5].textContent = dato.observaciones || '';
-                fila.children[6].textContent = dato.noValeCombustible || '';
-                fila.children[7].textContent = dato.galones || '';
-                fila.children[8].textContent = dato.valorQuetzal || '';
+                //fila.children[5].textContent = dato.observaciones || '';
+                fila.children[5].textContent = dato.noValeCombustible || '';
+                fila.children[6].textContent = dato.galones || '';
+                fila.children[7].textContent = dato.valorQuetzal || '';
+                fila.children[8].textContent = dato.observaciones || '';
+                fila.children[9].textContent = dato.piloto || '';
             }
         }
     });
@@ -316,4 +319,60 @@ async function buscarDatos() {
     document.getElementById('valorQtzMensual').value = totalValorQtz.toFixed(2);
     document.getElementById('mediaKmGalon').value = totalGalones > 0 ? (totalKm / totalGalones).toFixed(2) : '0.00';
 }
+
+// --- DESCARGA A EXCEL ---
+document.getElementById('descargarExcel').addEventListener('click', function () {
+    // Obtener filtros y resumenes
+    const anio = document.getElementById('filterAnio').value;
+    const mes = document.getElementById('filterMes').value;
+    const unidad = document.getElementById('filterNumeroUnidad').value;
+    const placa = document.getElementById('placaUnidad').value;
+    const piloto = document.getElementById('pilotoResponsable').value;
+
+    const kmMensual = document.getElementById('kmMensual').value;
+    const galonesMensual = document.getElementById('galonesMensual').value;
+    const valorQtzMensual = document.getElementById('valorQtzMensual').value;
+    const mediaKmGalon = document.getElementById('mediaKmGalon').value;
+
+    // Obtener la tabla
+    const tabla = document.getElementById('tablaRutas');
+    const ws_data = [];
+
+    // Agregar filtros arriba
+    ws_data.push(['Filtros']);
+    ws_data.push(['Año', anio]);
+    ws_data.push(['Mes', mes]);
+    ws_data.push(['Unidad', unidad]);
+    ws_data.push(['Placa', placa]);
+    ws_data.push(['Piloto Responsable', piloto]);
+    ws_data.push([]); // Línea vacía
+
+    // Agregar resumenes
+    ws_data.push(['Resumen Mensual']);
+    ws_data.push(['Km Mensual', kmMensual]);
+    ws_data.push(['Galones Mensual', galonesMensual]);
+    ws_data.push(['ValorQTZ Mensual', valorQtzMensual]);
+    ws_data.push(['MEDIA KM/GALON', mediaKmGalon]);
+    ws_data.push([]); // Línea vacía
+
+    // Agregar encabezados de la tabla
+    const headers = [];
+    tabla.querySelectorAll('thead th').forEach(th => headers.push(th.textContent));
+    ws_data.push(headers);
+
+    // Agregar filas de la tabla
+    tabla.querySelectorAll('tbody tr').forEach(tr => {
+        const row = [];
+        tr.querySelectorAll('td').forEach(td => row.push(td.textContent));
+        ws_data.push(row);
+    });
+
+    // Crear hoja y libro
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Hoja de Rutas");
+
+    // Descargar
+    XLSX.writeFile(wb, `Hoja_de_Rutas_${anio}_${mes}_${unidad}.xlsx`);
+});
 
