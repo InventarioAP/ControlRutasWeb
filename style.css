@@ -140,8 +140,17 @@ h1, h2 {
 
 
 .table-container {
+    max-height: 400px; /* Ajusta la altura máxima según tu preferencia */
     overflow-x: auto; /* Allows horizontal scrolling on small screens */
     margin-top: 20px;
+    margin-bottom: 1em;
+}
+/* Encabezado fijo para la tabla */
+#tablaRutas thead th {
+    position: sticky;
+    top: 0;
+    /* background: #f4f4f4; */
+    z-index: 2;
 }
 
 #tablaRutas {
