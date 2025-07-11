@@ -253,3 +253,25 @@ h1, h2 {
 .btn-ver-recibo:hover {
     background: #0056b3;
 }
+
+#modalOpcionesImagen {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+#modalOpcionesImagen[style*="display: flex"] {
+    display: flex !important;
+}
+
+subirImagenBtn.disabledStyle = {
+    backgroundColor: '#cccccc',
+    color: '#666666',
+    cursor: 'not-allowed'
+};
