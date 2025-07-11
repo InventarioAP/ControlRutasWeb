@@ -239,3 +239,17 @@ h1, h2 {
         width: 100%;
     }
 }
+
+/* Agrega esto a tu style.css */
+.btn-ver-recibo {
+    padding: 2px 10px;
+    font-size: 13px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-ver-recibo:hover {
+    background: #0056b3;
+}
