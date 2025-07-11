@@ -76,6 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const NO_VALE_COMB = document.getElementById('noValeCombustible').value;
         const GALONES = document.getElementById('galones').value;
         const VALORQTZ = document.getElementById('valorQuetzal').value;
+        const fotoInput = document.getElementById('foto-recibo');
+        let fotoFile = fotoInput.files[0] || null;
+        let fotoBase64 = '';
+        if (fotoFile) {
+            fotoBase64 = await fileToBase64(fotoFile);
+        }
 
         // Construir los datos como un array en el orden requerido
         const fila = [
@@ -91,15 +97,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             OBSERVACIONES,
             NO_VALE_COMB,
             GALONES,
-            VALORQTZ
+            VALORQTZ,
+            fotoFile
         ];
 
         // --- ENVÍO ROBUSTO Y SIMPLE ---
         // Ejemplo usando Google Apps Script Web App (debes crear tu propio endpoint)
         // Reemplaza la URL por la de tu Web App de Google Apps Script
-        const url = 'https://script.google.com/macros/s/AKfycby8KLO-bxydNiIiMXh-GRIqZ2A-P_S6ayadPLrcK_ljcldDlTG-_VpFx29As5qDNsZjZQ/exec';
-
-        // Usar FormData para enviar los datos como si fuera un formulario clásico
+        // const url = 'https://script.google.com/macros/s/AKfycby8KLO-bxydNiIiMXh-GRIqZ2A-P_S6ayadPLrcK_ljcldDlTG-_VpFx29As5qDNsZjZQ/exec';
+        // const url = 'https://script.google.com/macros/s/AKfycbxpoTulVAjFUoGrdsSKFkvy8thTyiikq-17EpvmfIll-bUYboW8hzvyTHu-LuMh_9fG6A/exec'; // Reemplaza por tu URL
+        const url = 'https://script.google.com/macros/s/AKfycbwGc8iBRYr33eY_aWtZfTKS_wmYORIyv1IdqDOrr2HZQl_csk2-8hJl0U6OsiQsc5C_DQ/exec';
+        // // Usar FormData para enviar los datos como si fuera un formulario clásico
         const formData = new FormData();
         formData.append('ANIO', ANIO);
         formData.append('MES', MES);
@@ -114,6 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('NO_VALE_COMB', NO_VALE_COMB);
         formData.append('GALONES', GALONES);
         formData.append('VALORQTZ', VALORQTZ);
+        formData.append('FOTO_RECIBO', fotoBase64);
 
         try {
             const response = await fetch(url, {
@@ -146,6 +155,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             this.value = this.value.toUpperCase();
         });
     }
+
+    // Foto del recibo: previsualización
+    const fotoInput = document.getElementById('foto-recibo');
+    const previewDiv = document.getElementById('foto-recibo-preview');
+    fotoInput.addEventListener('change', function() {
+        previewDiv.innerHTML = '';
+        if (this.files && this.files[0]) {
+            const img = document.createElement('img');
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.src = URL.createObjectURL(this.files[0]);
+            previewDiv.appendChild(img);
+        }
+    });
 });
 
 // --- View Management ---
@@ -172,7 +195,12 @@ function clearForm() {
 
 async function fetchSheetData(sheetName) {
     // Reemplaza 'TU_WEB_APP_ID_GET' con la misma URL de tu Web App de Apps Script
-    const url = `https://script.google.com/macros/s/AKfycby8KLO-bxydNiIiMXh-GRIqZ2A-P_S6ayadPLrcK_ljcldDlTG-_VpFx29As5qDNsZjZQ/exec/exec?sheetName=${sheetName}`;
+    const url = `https://script.google.com/macros/s/AKfycbwGc8iBRYr33eY_aWtZfTKS_wmYORIyv1IdqDOrr2HZQl_csk2-8hJl0U6OsiQsc5C_DQ/exec/exec?sheetName=${sheetName}`;
+
+    //const url = `https://script.google.com/macros/s/AKfycbwSVZ7kx5VW4g-2366fizvKvltPlzol73z97nHShNHlH9hNwyU5XtEXTmF0mYilIdtNwg/exec/exec?sheetName=${sheetName}`;
+    // const url = `https://script.google.com/macros/s/AKfycbxpoTulVAjFUoGrdsSKFkvy8thTyiikq-17EpvmfIll-bUYboW8hzvyTHu-LuMh_9fG6A/exec/exec?sheetName=${sheetName}`;
+    // const url = `https://script.google.com/macros/s/AKfycbySTMdQFBdPyBMqkgTNf3cnR3gwg1W0NSpC5b2ufmiTpfoffjvj9YyRAwhthN4A637UQQ/exec/exec?sheetName=${sheetName}`;
+
 
     try {
         const response = await fetch(url);
@@ -268,21 +296,17 @@ async function buscarDatos() {
             <td></td>
             <td></td>
             <td></td>
+            <td></td> <!-- Ver Recibo -->
         `;
         tbody.appendChild(tr);
     }
 
     const datos = await fetchSheetData("DATOS");
-    console.log('Todos los datos:', datos);
-    console.log('Filtros:', {anio, mes, numeroUnidad});
-
     const datosFiltrados = datos.filter(d =>
         d.anio == anio &&
         d.mes == mes &&
         d.numeroUnidad == numeroUnidad
     );
-
-    console.log('Filtrados:', datosFiltrados);
 
     datosFiltrados.forEach(dato => {
         const dia = parseInt(dato.numeroDia, 10);
@@ -293,12 +317,26 @@ async function buscarDatos() {
                 fila.children[2].textContent = dato.kmInicial || '';
                 fila.children[3].textContent = dato.kmFinal || '';
                 fila.children[4].textContent = dato.kmDia || '';
-                //fila.children[5].textContent = dato.observaciones || '';
                 fila.children[5].textContent = dato.noValeCombustible || '';
                 fila.children[6].textContent = dato.galones || '';
                 fila.children[7].textContent = dato.valorQuetzal || '';
                 fila.children[8].textContent = dato.observaciones || '';
                 fila.children[9].textContent = dato.piloto || '';
+
+                // Mostrar botón solo si hay datos de combustible y fotoRecibo
+                const tieneCombustible = (parseFloat(dato.galones) > 0 || parseFloat(dato.valorQuetzal) > 0) && dato.fotoRecibo;
+                if (tieneCombustible) {
+                    const img = document.createElement('img');
+                    img.src = 'data:image/jpeg;base64,' + dato.fotoRecibo;
+                    img.alt = 'Recibo';
+                    img.style.maxWidth = '60px';
+                    img.style.maxHeight = '60px';
+                    img.style.cursor = 'pointer';
+                    img.onclick = function() {
+                        mostrarImagenModal(img.src);
+                    };
+                    fila.children[10].appendChild(img);
+                }
             }
         }
     });
@@ -376,3 +414,57 @@ document.getElementById('descargarExcel').addEventListener('click', function () 
     XLSX.writeFile(wb, `Hoja_de_Rutas_${anio}_${mes}_${unidad}.xlsx`);
 });
 
+// Convierte cualquier archivo de imagen a un Blob JPG usando un canvas
+async function convertirImagenAJPG(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(
+                    blob => resolve(blob),
+                    'image/jpeg',
+                    0.92 // calidad
+                );
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Convierte un archivo a base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result.split(',')[1]); // Solo la parte base64
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function mostrarImagenModal(src) {
+    const modal = document.getElementById('modalImagen');
+    const modalImg = document.getElementById('modalImg');
+    modalImg.src = src;
+    modal.style.display = 'flex';
+}
+
+// Cierra el modal al hacer clic fuera de la imagen
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modalImagen');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+});
