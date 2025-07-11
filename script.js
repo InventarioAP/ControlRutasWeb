@@ -1,6 +1,32 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- SUBIR IMAGEN CON MODAL ---
-    document.getElementById('abrirModalImagen').addEventListener('click', function() {
+    const abrirModalImagenBtn = document.getElementById('abrirModalImagen');
+    const noValeCombustibleInput = document.getElementById('noValeCombustible');
+    const galonesInput = document.getElementById('galones');
+    const valorQuetzalInput = document.getElementById('valorQuetzal');
+
+    // Function to check input fields and enable/disable the "Subir imagen" button
+    const toggleSubirImagenButton = () => {
+        if (noValeCombustibleInput.value || (parseFloat(galonesInput.value) > 0) || (parseFloat(valorQuetzalInput.value) > 0)) {
+            abrirModalImagenBtn.disabled = false;
+            abrirModalImagenBtn.style.backgroundColor = '#007bff'; // Revert to original blue
+            abrirModalImagenBtn.style.cursor = 'pointer';
+        } else {
+            abrirModalImagenBtn.disabled = true;
+            abrirModalImagenBtn.style.backgroundColor = '#cccccc'; // Grey out when disabled
+            abrirModalImagenBtn.style.cursor = 'not-allowed';
+        }
+    };
+
+    // Add event listeners to the relevant input fields
+    noValeCombustibleInput.addEventListener('input', toggleSubirImagenButton);
+    galonesInput.addEventListener('input', toggleSubirImagenButton);
+    valorQuetzalInput.addEventListener('input', toggleSubirImagenButton);
+
+    // Initial check when the page loads
+    toggleSubirImagenButton();
+
+    abrirModalImagenBtn.addEventListener('click', function() {
         document.getElementById('modalOpcionesImagen').style.display = 'flex';
     });
 
@@ -18,12 +44,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('inputSeleccionarImagen').addEventListener('change', function(e) {
         manejarImagenSeleccionada(e.target.files[0]);
-        document.getElementById('modalOpcionesImagen').style.display = 'none';
     });
 
     document.getElementById('inputTomarFoto').addEventListener('change', function(e) {
         manejarImagenSeleccionada(e.target.files[0]);
-        document.getElementById('modalOpcionesImagen').style.display = 'none';
     });
 
     // Función para mostrar la imagen seleccionada
@@ -36,8 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             img.style.maxHeight = '200px';
             img.src = URL.createObjectURL(file);
             previewDiv.appendChild(img);
-            // Guardar el archivo para el submit
             document.getElementById('foto-recibo').archivoSeleccionado = file;
+        }
+        document.getElementById('modalOpcionesImagen').style.display = 'none';
+        // Scroll al botón de enviar
+        const enviarBtn = document.querySelector('button[type="submit"]');
+        if (enviarBtn) {
+            enviarBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 
@@ -80,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             enviarBtn.disabled = true;
         }
     };
-    
+
     kmInicialInput.addEventListener('input', calculateKmDia);
     kmFinalInput.addEventListener('input', calculateKmDia);
 
@@ -123,7 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const VALORQTZ = document.getElementById('valorQuetzal').value;
         const fotoInput = document.getElementById('foto-recibo');
         let fotoFile = fotoInput.archivoSeleccionado || null;
-        // let fotoFile = fotoInput.files[0] || null;
         let fotoBase64 = '';
         if (fotoFile) {
             fotoBase64 = await fileToBase64(fotoFile);
@@ -168,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('NO_VALE_COMB', NO_VALE_COMB);
         formData.append('GALONES', GALONES);
         formData.append('VALORQTZ', VALORQTZ);
-        formData.append('FOTO_RECIBO', fotoBase64);
+        formData.append('FOTO_RECIBO', fotoBase64); // <-- debe ser base64, no el archivo
 
         try {
             const response = await fetch(url, {
@@ -179,6 +207,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('Datos enviados correctamente');
                 clearForm();
                 recargarAnio(); // <-- Recarga el año después de limpiar el formulario
+                // Limpiar imagen seleccionada y previsualización
+                document.getElementById('foto-recibo').value = '';
+                document.getElementById('foto-recibo').archivoSeleccionado = null;
+                document.getElementById('foto-recibo-preview').innerHTML = '';
             } else {
                 alert('Error al enviar los datos');
             }
@@ -188,6 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             enviarBtn.disabled = false;
             enviarBtn.textContent = 'Enviar Datos';
             enviarBtn.style.backgroundColor = ''; // Vuelve al color original
+            toggleSubirImagenButton(); // Re-evaluate button state after submission
         }
     });
 
@@ -235,6 +268,18 @@ function showView(viewId) {
 function clearForm() {
     document.getElementById('ingresoForm').reset();
     document.getElementById('kmDia').value = '';
+    // After clearing the form, re-evaluate the "Subir imagen" button state
+    const noValeCombustibleInput = document.getElementById('noValeCombustible');
+    const galonesInput = document.getElementById('galones');
+    const valorQuetzalInput = document.getElementById('valorQuetzal');
+    const abrirModalImagenBtn = document.getElementById('abrirModalImagen');
+
+    // This ensures the button is disabled after a clear operation
+    if (abrirModalImagenBtn) { // Check if the element exists
+        abrirModalImagenBtn.disabled = true;
+        abrirModalImagenBtn.style.backgroundColor = '#cccccc';
+        abrirModalImagenBtn.style.cursor = 'not-allowed';
+    }
 }
 
 // --- FUNCIONES PARA CONSULTAR GOOGLE SHEETS ---
@@ -326,6 +371,11 @@ async function actualizarPlacaYPiloto() {
 
 // --- Buscar datos y llenar tabla en Ver Datos ---
 async function buscarDatos() {
+    const btnBuscar = document.getElementById('btnBuscarDatos');
+    btnBuscar.disabled = true;
+    btnBuscar.textContent = 'Buscando datos...';
+    btnBuscar.style.backgroundColor = '#ff9800'; // Naranja
+
     const anio = document.getElementById('filterAnio').value;
     const mes = document.getElementById('filterMes').value;
     const numeroUnidad = document.getElementById('filterNumeroUnidad').value;
@@ -345,8 +395,7 @@ async function buscarDatos() {
             <td></td>
             <td></td>
             <td></td>
-            <td></td> <!-- Ver Recibo -->
-        `;
+            <td></td> `;
         tbody.appendChild(tr);
     }
 
@@ -405,6 +454,29 @@ async function buscarDatos() {
     document.getElementById('galonesMensual').value = totalGalones.toFixed(2);
     document.getElementById('valorQtzMensual').value = totalValorQtz.toFixed(2);
     document.getElementById('mediaKmGalon').value = totalGalones > 0 ? (totalKm / totalGalones).toFixed(2) : '0.00';
+
+    // Al finalizar la búsqueda:
+    btnBuscar.disabled = false;
+    btnBuscar.textContent = 'Buscar Datos';
+    btnBuscar.style.backgroundColor = ''; // Vuelve al color original
+
+    // Mostrar mensaje de éxito
+    const mensaje = document.createElement('div');
+    mensaje.textContent = 'Datos encontrados exitosamente';
+    mensaje.style.color = 'green';
+    mensaje.style.margin = '10px 0';
+    mensaje.style.fontWeight = 'bold';
+
+    // Coloca el mensaje arriba de la tabla
+    const tablaContainer = document.querySelector('.table-container');
+    if (tablaContainer) {
+        // Elimina mensajes anteriores
+        const prevMsg = document.getElementById('msgDatosEncontrados');
+        if (prevMsg) prevMsg.remove();
+        mensaje.id = 'msgDatosEncontrados';
+        tablaContainer.parentNode.insertBefore(mensaje, tablaContainer);
+        setTimeout(() => mensaje.remove(), 2500); // Quita el mensaje después de 2.5 segundos
+    }
 }
 
 // --- DESCARGA A EXCEL ---
