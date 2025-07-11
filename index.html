@@ -101,6 +101,16 @@
                     <input type="number" id="valorQuetzal" step="0.01">
                 </div>
 
+                <!-- Agrega esto al final de tu formulario, antes del botón de enviar -->
+                <div class="form-group">
+                <label for="foto-recibo">Foto del Recibo:</label>
+                <input type="file" id="foto-recibo" accept="image/*" capture="environment">
+                <small id="foto-recibo-help" class="form-text text-muted">
+                    Puedes tomar una foto o seleccionar una imagen.
+                </small>
+                <div id="foto-recibo-preview" style="margin-top:10px;"></div>
+                </div>
+
                 <div class="button-group">
                     <button type="submit">Enviar Datos</button>
                     <button type="button" onclick="clearForm()">Limpiar</button>
@@ -189,12 +199,12 @@
                             <th>KM INICIAL</th>
                             <th>KM FINAL</th>
                             <th>KM DÍA</th>
-                            <!-- <th>OBSERVACIONES</th> -->
                             <th>NO. VALE</th>
                             <th>GALONES</th>
                             <th>VALOR (Q)</th>
                             <th>OBSERVACIONES</th>
                             <th>PILOTO</th>
+                            <th>Ver Recibo</th> <!-- Nueva columna -->
                         </tr>
                     </thead>
                     <tbody>
@@ -207,5 +217,10 @@
 
     <script src="script.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Modal para mostrar la imagen en grande -->
+<div id="modalImagen" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
+    <img id="modalImg" src="" style="max-width:90vw; max-height:90vh; border:5px solid #fff; border-radius:10px;">
+</div>
 </body>
 </html>
