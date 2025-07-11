@@ -22,7 +22,7 @@
             <form id="ingresoForm">
 
                 <div class="form-group">
-                    <label for="anio">Año:</label>
+                    <label for="anio">Año (No editable):</label>
                     <input type="text" id="anio" readonly required>
                 </div>
 
@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="piloto">Piloto:</label>
+                    <label for="piloto">Piloto (Piloto del día):</label>
                     <select id="piloto" required></select>
                 </div>
 
@@ -62,7 +62,7 @@
                         </select>
                 </div>
                 <div class="form-group">
-                    <label for="rutaRecorrida">Ruta Recorrida:</label>
+                    <label for="rutaRecorrida">Ruta Recorrida (RUTA INICIAL - INTERMEDIO - RUTA FINAL):</label>
                     <input type="text" id="rutaRecorrida" required>
                 </div>
 
@@ -104,11 +104,27 @@
                 <!-- Agrega esto al final de tu formulario, antes del botón de enviar -->
                 <div class="form-group">
                 <label for="foto-recibo">Foto del Recibo:</label>
-                <input type="file" id="foto-recibo" accept="image/*" capture="environment">
-                <small id="foto-recibo-help" class="form-text text-muted">
-                    Puedes tomar una foto o seleccionar una imagen.
-                </small>
+                <button type="button" id="abrirModalImagen" style="padding:10px 18px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+                    Subir imagen
+                </button>
                 <div id="foto-recibo-preview" style="margin-top:10px;"></div>
+                </div>
+
+                <!-- Modal para elegir método de imagen -->
+                <div id="modalOpcionesImagen" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+                    <div style="background:#fff; padding:25px 30px; border-radius:10px; box-shadow:0 2px 10px #0002; display:flex; flex-direction:column; align-items:center;">
+                        <h3 style="margin-bottom:18px;">Selecciona una opción</h3>
+                        <button id="btnSeleccionarImagen" style="margin-bottom:15px; font-size:18px; display:flex; align-items:center; gap:8px; padding:10px 18px; background:#28a745; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+                            <span>📁</span> Seleccionar imagen
+                        </button>
+                        <button id="btnTomarFoto" style="font-size:18px; display:flex; align-items:center; gap:8px; padding:10px 18px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+                            <span>📷</span> Tomar foto
+                        </button>
+                        <button id="cerrarModalImagen" style="margin-top:18px; background:#dc3545; color:#fff; border:none; border-radius:5px; padding:8px 16px; cursor:pointer;">Cancelar</button>
+                        <!-- Inputs ocultos para disparar los métodos -->
+                        <input type="file" id="inputSeleccionarImagen" accept="image/*" style="display:none;">
+                        <input type="file" id="inputTomarFoto" accept="image/*" capture="environment" style="display:none;">
+                    </div>
                 </div>
 
                 <div class="button-group">
