@@ -1,4 +1,47 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // --- SUBIR IMAGEN CON MODAL ---
+    document.getElementById('abrirModalImagen').addEventListener('click', function() {
+        document.getElementById('modalOpcionesImagen').style.display = 'flex';
+    });
+
+    document.getElementById('cerrarModalImagen').addEventListener('click', function() {
+        document.getElementById('modalOpcionesImagen').style.display = 'none';
+    });
+
+    document.getElementById('btnSeleccionarImagen').addEventListener('click', function() {
+        document.getElementById('inputSeleccionarImagen').click();
+    });
+
+    document.getElementById('btnTomarFoto').addEventListener('click', function() {
+        document.getElementById('inputTomarFoto').click();
+    });
+
+    document.getElementById('inputSeleccionarImagen').addEventListener('change', function(e) {
+        manejarImagenSeleccionada(e.target.files[0]);
+        document.getElementById('modalOpcionesImagen').style.display = 'none';
+    });
+
+    document.getElementById('inputTomarFoto').addEventListener('change', function(e) {
+        manejarImagenSeleccionada(e.target.files[0]);
+        document.getElementById('modalOpcionesImagen').style.display = 'none';
+    });
+
+    // Función para mostrar la imagen seleccionada
+    function manejarImagenSeleccionada(file) {
+        const previewDiv = document.getElementById('foto-recibo-preview');
+        previewDiv.innerHTML = '';
+        if (file) {
+            const img = document.createElement('img');
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.src = URL.createObjectURL(file);
+            previewDiv.appendChild(img);
+            // Guardar el archivo para el submit
+            document.getElementById('foto-recibo').archivoSeleccionado = file;
+        }
+    }
+
+
     // --- NUEVO: Establecer el año actual en el campo de año ---
     const anioInput = document.getElementById('anio');
     if (anioInput) {
@@ -60,7 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        enviarBtn.disabled = true; // Deshabilitar botón mientras se envía
+        enviarBtn.disabled = true;
+        enviarBtn.textContent = 'Enviando datos...';
+        enviarBtn.style.backgroundColor = '#ff9800'; // Naranja
 
         // Recoger los datos del formulario en el orden solicitado
         const ANIO = document.getElementById('anio').value;
@@ -77,7 +122,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const GALONES = document.getElementById('galones').value;
         const VALORQTZ = document.getElementById('valorQuetzal').value;
         const fotoInput = document.getElementById('foto-recibo');
-        let fotoFile = fotoInput.files[0] || null;
+        let fotoFile = fotoInput.archivoSeleccionado || null;
+        // let fotoFile = fotoInput.files[0] || null;
         let fotoBase64 = '';
         if (fotoFile) {
             fotoBase64 = await fileToBase64(fotoFile);
@@ -132,13 +178,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 alert('Datos enviados correctamente');
                 clearForm();
+                recargarAnio(); // <-- Recarga el año después de limpiar el formulario
             } else {
                 alert('Error al enviar los datos');
             }
         } catch (error) {
             alert('Error de conexión al enviar los datos');
         } finally {
-            enviarBtn.disabled = false; // Habilitar botón después del envío
+            enviarBtn.disabled = false;
+            enviarBtn.textContent = 'Enviar Datos';
+            enviarBtn.style.backgroundColor = ''; // Vuelve al color original
         }
     });
 
@@ -157,18 +206,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Foto del recibo: previsualización
-    const fotoInput = document.getElementById('foto-recibo');
-    const previewDiv = document.getElementById('foto-recibo-preview');
-    fotoInput.addEventListener('change', function() {
-        previewDiv.innerHTML = '';
-        if (this.files && this.files[0]) {
-            const img = document.createElement('img');
-            img.style.maxWidth = '200px';
-            img.style.maxHeight = '200px';
-            img.src = URL.createObjectURL(this.files[0]);
-            previewDiv.appendChild(img);
-        }
-    });
+    //const fotoInput = document.getElementById('foto-recibo');
+    //const previewDiv = document.getElementById('foto-recibo-preview');
+    // fotoInput.addEventListener('change', function() {
+    //     previewDiv.innerHTML = '';
+    //     if (this.files && this.files[0]) {
+    //         const img = document.createElement('img');
+    //         img.style.maxWidth = '200px';
+    //         img.style.maxHeight = '200px';
+    //         img.src = URL.createObjectURL(this.files[0]);
+    //         previewDiv.appendChild(img);
+    //     }
+    // });
 });
 
 // --- View Management ---
@@ -468,3 +517,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function recargarAnio() {
+    const anioInput = document.getElementById('anio');
+    if (anioInput) {
+        anioInput.value = new Date().getFullYear();
+    }
+}
