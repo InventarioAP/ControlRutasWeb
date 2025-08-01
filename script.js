@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Reemplaza la URL por la de tu Web App de Google Apps Script
         // const url = 'https://script.google.com/macros/s/AKfycby8KLO-bxydNiIiMXh-GRIqZ2A-P_S6ayadPLrcK_ljcldDlTG-_VpFx29As5qDNsZjZQ/exec';
         // const url = 'https://script.google.com/macros/s/AKfycbxpoTulVAjFUoGrdsSKFkvy8thTyiikq-17EpvmfIll-bUYboW8hzvyTHu-LuMh_9fG6A/exec'; // Reemplaza por tu URL
-        const url = 'https://script.google.com/macros/s/AKfycbwGc8iBRYr33eY_aWtZfTKS_wmYORIyv1IdqDOrr2HZQl_csk2-8hJl0U6OsiQsc5C_DQ/exec';
+        const url = 'https://script.google.com/macros/s/AKfycbx3R1R1XhTGh7ZboHxqTbd-WT6CJd4Z7o_hlPwc0jXH4QfzO8VctykLeJDKDwbTCNECSQ/exec';
         // // Usar FormData para enviar los datos como si fuera un formulario clásico
         const formData = new FormData();
         formData.append('ANIO', ANIO);
@@ -289,7 +289,7 @@ function clearForm() {
 
 async function fetchSheetData(sheetName) {
     // Reemplaza 'TU_WEB_APP_ID_GET' con la misma URL de tu Web App de Apps Script
-    const url = `https://script.google.com/macros/s/AKfycbwGc8iBRYr33eY_aWtZfTKS_wmYORIyv1IdqDOrr2HZQl_csk2-8hJl0U6OsiQsc5C_DQ/exec/exec?sheetName=${sheetName}`;
+    const url = `https://script.google.com/macros/s/AKfycbx3R1R1XhTGh7ZboHxqTbd-WT6CJd4Z7o_hlPwc0jXH4QfzO8VctykLeJDKDwbTCNECSQ/exec/exec?sheetName=${sheetName}`;
 
     //const url = `https://script.google.com/macros/s/AKfycbwSVZ7kx5VW4g-2366fizvKvltPlzol73z97nHShNHlH9hNwyU5XtEXTmF0mYilIdtNwg/exec/exec?sheetName=${sheetName}`;
     // const url = `https://script.google.com/macros/s/AKfycbxpoTulVAjFUoGrdsSKFkvy8thTyiikq-17EpvmfIll-bUYboW8hzvyTHu-LuMh_9fG6A/exec/exec?sheetName=${sheetName}`;
@@ -370,6 +370,7 @@ async function actualizarPlacaYPiloto() {
 }
 
 // --- Buscar datos y llenar tabla en Ver Datos ---
+// --- Buscar datos y llenar tabla en Ver Datos ---
 async function buscarDatos() {
     const btnBuscar = document.getElementById('btnBuscarDatos');
     btnBuscar.disabled = true;
@@ -421,19 +422,16 @@ async function buscarDatos() {
                 fila.children[8].textContent = dato.observaciones || '';
                 fila.children[9].textContent = dato.piloto || '';
 
-                // Mostrar botón solo si hay datos de combustible y fotoRecibo
+                // Mostrar botón solo si hay datos de combustible y una URL de recibo
                 const tieneCombustible = (parseFloat(dato.galones) > 0 || parseFloat(dato.valorQuetzal) > 0) && dato.fotoRecibo;
                 if (tieneCombustible) {
-                    const img = document.createElement('img');
-                    img.src = 'data:image/jpeg;base64,' + dato.fotoRecibo;
-                    img.alt = 'Recibo';
-                    img.style.maxWidth = '60px';
-                    img.style.maxHeight = '60px';
-                    img.style.cursor = 'pointer';
-                    img.onclick = function() {
-                        mostrarImagenModal(img.src);
+                    const btnVerRecibo = document.createElement('button');
+                    btnVerRecibo.textContent = 'VER RECIBO';
+                    btnVerRecibo.className = 'btn-ver-recibo';
+                    btnVerRecibo.onclick = function() {
+                        window.open(dato.fotoRecibo, '_blank');
                     };
-                    fila.children[10].appendChild(img);
+                    fila.children[10].appendChild(btnVerRecibo);
                 }
             }
         }
